@@ -1,18 +1,17 @@
 <!--
-TODO Das Framework muss anbieten, dass man alle Labels individuell benennen kann.
 TODO Die Tabelle muss als PDF, CSV und Excel exportiert werden kÖnnen
 TODO Der Export muss min. in folgenden Punkten customizable sein: Füllfarbe der Tabelle
 TODO Das Framework muss den DOM bei einer Seitengrössen von min. 100 Zeilen noch in unter 0.5 Sekunden generieren können.
 TODO Das Framework muss ermöglichen, dass man 1-n Zeilen selektieren kann, um diese als PDF, CSV und Excel exportieren zu können.
 TODO Das Framework muss alle Funktionen, die mit Maus erledigt werden können, auch als Touch-Variante anbieten.
 TODO Es müssen min. folgende Webbrowser unterstützt werden: Google Chrome, Firefox, Safari, Edge
-TODO Frontend Pagination, d.h. man kann im Frontend die Seitengr¨osse festlegen und die Ergebnisse werden entsprechend dargestellt.
 -->
 
 <!--
 WON'T BE DONE
 - Skipping through pages while cells are grouped
 - effort for good code quality / safe or generic code ...
+- No external translation for control elements and table data, just control elements
 -->
 
 <!DOCTYPE html>
@@ -27,35 +26,141 @@ WON'T BE DONE
 </head>
 <body>
 
-<label>
-    <input class="group-by" type="checkbox" value="name"/>
-    Name
-</label> <br>
-<label>
-    <input class="group-by" type="checkbox" value="col"/>
-    Favourite Color
-</label> <br>
-<label>
-    <input class="group-by" type="checkbox" value="dob"/>
-    Date Of Birth
-</label> <br>
-<label>
-    <input class="group-by" type="checkbox" value="available"/>
-    Available
-</label> <br>
+<div id="controls">
+    <div>
+        <label>
+            <input class="group-by" type="checkbox" value="name"/>
+            Name
+        </label> <br>
+        <label>
+            <input class="group-by" type="checkbox" value="col"/>
+            Favourite Color
+        </label> <br>
+        <label>
+            <input class="group-by" type="checkbox" value="dob"/>
+            Date Of Birth
+        </label> <br>
+        <label>
+            <input class="group-by" type="checkbox" value="available"/>
+            Available
+        </label>
+    </div>
+    <div>
+        <label>
+            <select class="pagination-size">
+                <option value="3"> 3</option>
+                <option value="6"> 6</option>
+                <option value="10"> 10</option>
+            </select>
+            Select Page Size
+        </label>
+    </div>
+    <div>
+        <label>
+            <select class="language">
+                <option value="de"> DE</option>
+                <option value="en-gb"> EN-GB</option>
+                <option value="fr"> FR</option>
+            </select>
+            Select Language
+        </label>
+    </div>
+</div>
 
-<label>
-    <select class="pagination-size">
-        <option value="3"> 3</option>
-        <option value="6"> 6</option>
-        <option value="10"> 10</option>
-    </select>
-    Select Page Size
-</label>
 
 <div id="example-table"></div>
 </body>
 <script>
+  let langs = {
+    "de": {
+      "columns": {
+        "name": "Name",
+        "col": "Lieblingsfarbe",
+        "dob": "Geburtsdatum",
+        "dwit": "Total Arbeitstage",
+        "available": "verfügbar",
+      },
+      "groups": {
+        "item": "Element",
+        "items": "Elemente",
+      },
+      "pagination": {
+        "counter": {
+          "showing": "Zeilen",
+          "of": "von",
+          "rows": "sichtbar",
+        },
+        "page_title": "Zeige Seite",
+        "first": "Erste",
+        "first_title": "Erste Seite",
+        "last": "Letzte",
+        "last_title": "Letzte Seite",
+        "prev": "Vorherige",
+        "prev_title": "Vorherige Seite",
+        "next": "Nächste",
+        "next_title": "Nächste Seite",
+      },
+    },
+    "en-gb": {
+      "columns": {
+        "name": "Name",
+        "col": "Favourite Color",
+        "dob": "Date Of Birth",
+        "dwit": "Days worked in total",
+        "available": "Available",
+      },
+      "groups": {
+        "item": "Item",
+        "items": "Items",
+      },
+      "pagination": {
+        "counter": {
+          "showing": "Rows",
+          "of": "of",
+          "rows": "visible",
+        },
+        "page_title": "Show Page",
+        "first": "First",
+        "first_title": "First Page",
+        "last": "Last",
+        "last_title": "Last Page",
+        "prev": "Prev",
+        "prev_title": "Prev Page",
+        "next": "Next",
+        "next_title": "Next Page",
+      },
+    },
+    "fr": {
+      "columns": {
+        "name": "Nom",
+        "col": "Couleur préféré",
+        "dob": "Date de naissance",
+        "dwit": "Total jours de travail",
+        "available": "Disponible",
+      },
+      "groups": {
+        "item": "élément",
+        "items": "éléments",
+      },
+      "pagination": {
+        "counter": {
+          "showing": "Lignes",
+          "of": "de",
+          "rows": "visible",
+        },
+        "page_title": "Montre page",
+        "first": "Première",
+        "first_title": "Première Page",
+        "last": "Dernière",
+        "last_title": "Dernière Page",
+        "prev": "Précédente",
+        "prev_title": "Page précédente",
+        "next": "Prochaine",
+        "next_title": "Prochaine Page",
+      },
+    }
+  };
+
   //define data
   var tabledata = 0;
 
@@ -92,6 +197,9 @@ WON'T BE DONE
           setValues();
         });
 
+        document.querySelector(".language").value = localStorage.getItem("language");
+        table.setLocale(localStorage.getItem("language"));
+
         clearInterval(intervalId);
       }
     }, 100)
@@ -122,6 +230,8 @@ WON'T BE DONE
     table.setPageSize(true);
   }
 
+  let lang = localStorage.getItem("language");
+
   //define table
   var table = new Tabulator("#example-table", {
     height: "100%", // set height of table (in CSS or here), this enables the Virtual DOM and improves render speed dramatically (can be any valid css height value),
@@ -129,30 +239,35 @@ WON'T BE DONE
     ajaxResponse: function (url, params, response) {
       for (let el of response) {
         debugger
-        el["name"] += ` (${el["name"].replace(/[^A-Z0-9]/g,'')})`;
+        el["name"] += ` (${el["name"].replace(/[^A-Z0-9]/g, '')})`;
       }
       return response;
     },
     layout: "fitData", //fit columns to data (optional),
     pagination: true, //enable pagination
+    reactiveData: true,
     paginationMode: "local", //enable local pagination
     paginationSize: localStorage.getItem("pageSize"),
     paginationInitialPage: localStorage.getItem("page"),
     paginationCounter: "rows", //add pagination row counter
-    columns: [ //Define Table Columns
-      {title: "Name", field: "name", width: 150, headerSort: false},
-      {title: "Favourite Color", field: "col", headerSort: false},
-      {title: "Date Of Birth", field: "dob", headerSort: false},
-      {title: "Days worked in total", field: "dwit", topCalc: calculateSumPerPage, headerSort: false},
-      {title: "Available", field: "available", formatter: "html", hozAlign: "center", headerSort: false},
+    columns: [
+      {title: langs[lang ? lang : "en"].columns.name, field: "name", headerSort: false},
+      {title: langs[lang ? lang : "en"].columns.col, field: "col", headerSort: false},
+      {title: langs[lang ? lang : "en"].columns.dob, field: "dob", headerSort: false},
+      {title: langs[lang ? lang : "en"].columns.dwit, field: "dwit", topCalc: calculateSumPerPage, headerSort: false},
+      {title: langs[lang ? lang : "en"].columns.available, field: "available", formatter: "html", hozAlign: "center", headerSort: false},
       {title: "Current Page", field: "current_page", headerSort: false, visible: false}
     ],
+    langs: langs
   });
 
   document.querySelector(".pagination-size").value = localStorage.getItem("pageSize");
+  document.querySelector(".language").addEventListener("change", (e) => {
+    localStorage.setItem("language", e.target.value);
+    location.reload();
+  });
 
   let groupByCheckboxes = Array.from(document.getElementsByClassName("group-by"));
-
   for (let el of groupByCheckboxes) {
     el.addEventListener("change", () => handleCheckBoxSelected());
   }

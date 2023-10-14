@@ -3,3 +3,10 @@
 .tabulator-group-level-0 {
   display: none;
 }
+
+#controls {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
