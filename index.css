@@ -1,1 +1,5 @@
 @import "https://unpkg.com/tabulator-tables@5.5.2/dist/css/tabulator.min.css";
+
+.tabulator-group-level-0 {
+  display: none;
+}

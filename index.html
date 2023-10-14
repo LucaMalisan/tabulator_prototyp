@@ -1,5 +1,4 @@
 <!--
-TODO Das Framework muss es erlauben, dass man bei wichtigen Events mit eigenem Code intervenieren kann. Dazu gehören min. nach einem erfolgreichen AJAX-Request, bevor die erhaltenen Daten angezeigt werden
 TODO Das Framework muss anbieten, dass man alle Labels individuell benennen kann.
 TODO Die Tabelle muss als PDF, CSV und Excel exportiert werden kÖnnen
 TODO Der Export muss min. in folgenden Punkten customizable sein: Füllfarbe der Tabelle
@@ -13,8 +12,7 @@ TODO Frontend Pagination, d.h. man kann im Frontend die Seitengr¨osse festlegen
 <!--
 WON'T BE DONE
 - Skipping through pages while cells are grouped
-- hide "true" cell
-- No effort for good code quality / safe or generic code ...
+- effort for good code quality / safe or generic code ...
 -->
 
 <!DOCTYPE html>
@@ -58,122 +56,8 @@ WON'T BE DONE
 <div id="example-table"></div>
 </body>
 <script>
-  let checkMark = "<span class=\"material-symbols-outlined\"> done_outline </span>";
-  let cross = "<span class=\"material-symbols-outlined\"> close </span>";
-
   //define data
-  var tabledata = [
-    {
-      id: 1,
-      name: "Oli Bob",
-      location: "United Kingdom",
-      gender: "male",
-      rating: 1,
-      col: "red",
-      dob: "14/04/1984",
-      dwit: 300,
-      available: checkMark
-    },
-    {
-      id: 2,
-      name: "Mary May",
-      location: "Germany",
-      gender: "female",
-      rating: 2,
-      col: "blue",
-      dob: "14/05/1982",
-      dwit: 100,
-      available: cross
-    },
-    {
-      id: 3,
-      name: "Christine Lobowski",
-      location: "France",
-      gender: "female",
-      rating: 0,
-      col: "green",
-      dob: "22/05/1982",
-      dwit: 30,
-      available: checkMark
-    },
-    {
-      id: 4,
-      name: "Brendon Philips",
-      location: "USA",
-      gender: "male",
-      rating: 1,
-      col: "orange",
-      dob: "01/08/1980",
-      dwit: 80,
-      available: cross
-    },
-    {
-      id: 5,
-      name: "Margret Marmajuke",
-      location: "Canada",
-      gender: "female",
-      rating: 5,
-      col: "yellow",
-      dob: "31/01/1999",
-      dwit: 50,
-      available: cross
-    },
-    {
-      id: 6,
-      name: "Frank Harbours",
-      location: "Russia",
-      gender: "male",
-      rating: 4,
-      col: "red",
-      dob: "12/05/1966",
-      dwit: 90,
-      available: checkMark
-    },
-    {
-      id: 7,
-      name: "Jamie Newhart",
-      location: "India",
-      gender: "male",
-      rating: 3,
-      col: "green",
-      dob: "14/05/1985",
-      dwit: 20,
-      available: cross
-    },
-    {
-      id: 8,
-      name: "Gemma Jane",
-      location: "China",
-      gender: "female",
-      rating: 0,
-      col: "red",
-      dob: "22/05/1982",
-      dwit: 120,
-      available: cross
-    },
-    {
-      id: 9,
-      name: "Emily Sykes",
-      location: "South Korea",
-      gender: "female",
-      rating: 1,
-      col: "maroon",
-      dob: "11/11/1970",
-      dwit: 75,
-      available: checkMark
-    },
-    {
-      id: 10,
-      name: "James Newman",
-      location: "Japan",
-      gender: "male",
-      rating: 5,
-      col: "red",
-      dob: "22/03/1998",
-      dwit: 450,
-      available: cross
-    },
-  ];
+  var tabledata = 0;
 
   var calculateSumPerPage = function (values, data, calcParams) {
     //values - array of column values
@@ -240,8 +124,15 @@ WON'T BE DONE
 
   //define table
   var table = new Tabulator("#example-table", {
-    height: "100%", // set height of table (in CSS or here), this enables the Virtual DOM and improves render speed dramatically (can be any valid css height value)
-    data: tabledata, //assign data to table
+    height: "100%", // set height of table (in CSS or here), this enables the Virtual DOM and improves render speed dramatically (can be any valid css height value),
+    ajaxURL: "data.json",
+    ajaxResponse: function (url, params, response) {
+      for (let el of response) {
+        debugger
+        el["name"] += ` (${el["name"].replace(/[^A-Z0-9]/g,'')})`;
+      }
+      return response;
+    },
     layout: "fitData", //fit columns to data (optional),
     pagination: true, //enable pagination
     paginationMode: "local", //enable local pagination
