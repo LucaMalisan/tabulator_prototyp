@@ -5,12 +5,16 @@ TODO Die Tabelle muss als PDF, CSV und Excel exportiert werden kÖnnen
 TODO Der Export muss min. in folgenden Punkten customizable sein: Füllfarbe der Tabelle
 TODO Das Framework muss den DOM bei einer Seitengrössen von min. 100 Zeilen noch in unter 0.5 Sekunden generieren können.
 TODO Das Framework muss ermöglichen, dass man 1-n Zeilen selektieren kann, um diese als PDF, CSV und Excel exportieren zu können.
-TODO Das Framework muss erlauben, dass man folgende Parameter auslesen kann: Die aktuelle Seite und Seitengrösse
-TODO Jedes sichtbare Element muss vollständig mit CSS gestyled werden köonnen.
 TODO Das Framework muss alle Funktionen, die mit Maus erledigt werden können, auch als Touch-Variante anbieten.
 TODO Es müssen min. folgende Webbrowser unterstützt werden: Google Chrome, Firefox, Safari, Edge
 TODO Frontend Pagination, d.h. man kann im Frontend die Seitengr¨osse festlegen und die Ergebnisse werden entsprechend dargestellt.
-TODO Das Framework muss ermöglichen, dass sich die Zellen automatisch der Textbreite anpassen.
+-->
+
+<!--
+WON'T BE DONE
+- Skipping through pages while cells are grouped
+- hide "true" cell
+- No effort for good code quality / safe or generic code ...
 -->
 
 <!DOCTYPE html>
@@ -20,7 +24,8 @@ TODO Das Framework muss ermöglichen, dass sich die Zellen automatisch der Textb
     <title>Title</title>
     <script src="./tabulator-master/dist/js/tabulator.min.js"></script>
     <link href="index.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0"/>
 </head>
 <body>
 
@@ -41,46 +46,226 @@ TODO Das Framework muss ermöglichen, dass sich die Zellen automatisch der Textb
     Available
 </label> <br>
 
+<label>
+    <select class="pagination-size">
+        <option value="3"> 3</option>
+        <option value="6"> 6</option>
+        <option value="10"> 10</option>
+    </select>
+    Select Page Size
+</label>
+
 <div id="example-table"></div>
 </body>
 <script>
-    let checkMark = "<span class=\"material-symbols-outlined\"> done_outline </span>";
-    let cross = "<span class=\"material-symbols-outlined\"> close </span>";
+  let checkMark = "<span class=\"material-symbols-outlined\"> done_outline </span>";
+  let cross = "<span class=\"material-symbols-outlined\"> close </span>";
 
-    //define data
-    var tabledata = [
-        {id:1, name:"Oli Bob", location:"United Kingdom", gender:"male", rating:1, col:"red", dob:"14/04/1984", dwit: 300, available: checkMark},
-        {id:2, name:"Mary May", location:"Germany", gender:"female", rating:2, col:"blue", dob:"14/05/1982", dwit: 100, available: cross},
-        {id:3, name:"Christine Lobowski", location:"France", gender:"female", rating:0, col:"green", dob:"22/05/1982", dwit: 30, available: checkMark},
-        {id:4, name:"Brendon Philips", location:"USA", gender:"male", rating:1, col:"orange", dob:"01/08/1980", dwit: 80, available: cross},
-        {id:5, name:"Margret Marmajuke", location:"Canada", gender:"female", rating:5, col:"yellow", dob:"31/01/1999", dwit: 50, available: cross},
-        {id:6, name:"Frank Harbours", location:"Russia", gender:"male", rating:4, col:"red", dob:"12/05/1966", dwit: 90, available: checkMark},
-        {id:7, name:"Jamie Newhart", location:"India", gender:"male", rating:3, col:"green", dob:"14/05/1985", dwit: 20, available: cross},
-        {id:8, name:"Gemma Jane", location:"China", gender:"female", rating:0, col:"red", dob:"22/05/1982", dwit: 120, available: cross},
-        {id:9, name:"Emily Sykes", location:"South Korea", gender:"female", rating:1, col:"maroon", dob:"11/11/1970", dwit: 75, available: checkMark},
-        {id:10, name:"James Newman", location:"Japan", gender:"male", rating:5, col:"red", dob:"22/03/1998", dwit: 450, available: cross},
-    ];
+  //define data
+  var tabledata = [
+    {
+      id: 1,
+      name: "Oli Bob",
+      location: "United Kingdom",
+      gender: "male",
+      rating: 1,
+      col: "red",
+      dob: "14/04/1984",
+      dwit: 300,
+      available: checkMark
+    },
+    {
+      id: 2,
+      name: "Mary May",
+      location: "Germany",
+      gender: "female",
+      rating: 2,
+      col: "blue",
+      dob: "14/05/1982",
+      dwit: 100,
+      available: cross
+    },
+    {
+      id: 3,
+      name: "Christine Lobowski",
+      location: "France",
+      gender: "female",
+      rating: 0,
+      col: "green",
+      dob: "22/05/1982",
+      dwit: 30,
+      available: checkMark
+    },
+    {
+      id: 4,
+      name: "Brendon Philips",
+      location: "USA",
+      gender: "male",
+      rating: 1,
+      col: "orange",
+      dob: "01/08/1980",
+      dwit: 80,
+      available: cross
+    },
+    {
+      id: 5,
+      name: "Margret Marmajuke",
+      location: "Canada",
+      gender: "female",
+      rating: 5,
+      col: "yellow",
+      dob: "31/01/1999",
+      dwit: 50,
+      available: cross
+    },
+    {
+      id: 6,
+      name: "Frank Harbours",
+      location: "Russia",
+      gender: "male",
+      rating: 4,
+      col: "red",
+      dob: "12/05/1966",
+      dwit: 90,
+      available: checkMark
+    },
+    {
+      id: 7,
+      name: "Jamie Newhart",
+      location: "India",
+      gender: "male",
+      rating: 3,
+      col: "green",
+      dob: "14/05/1985",
+      dwit: 20,
+      available: cross
+    },
+    {
+      id: 8,
+      name: "Gemma Jane",
+      location: "China",
+      gender: "female",
+      rating: 0,
+      col: "red",
+      dob: "22/05/1982",
+      dwit: 120,
+      available: cross
+    },
+    {
+      id: 9,
+      name: "Emily Sykes",
+      location: "South Korea",
+      gender: "female",
+      rating: 1,
+      col: "maroon",
+      dob: "11/11/1970",
+      dwit: 75,
+      available: checkMark
+    },
+    {
+      id: 10,
+      name: "James Newman",
+      location: "Japan",
+      gender: "male",
+      rating: 5,
+      col: "red",
+      dob: "22/03/1998",
+      dwit: 450,
+      available: cross
+    },
+  ];
 
-    //define table
-    var table = new Tabulator("#example-table", {
-        height: "100%", // set height of table (in CSS or here), this enables the Virtual DOM and improves render speed dramatically (can be any valid css height value)
-        data: tabledata, //assign data to table
-        layout: "fitColumns", //fit columns to width of table (optional),
-        columns: [ //Define Table Columns
-            {title: "Name", field: "name", width: 150, headerSort: false},
-            {title: "Favourite Color", field: "col", headerSort: false},
-            {title: "Date Of Birth", field: "dob", headerSort: false},
-            {title: "Days worked in total", field: "dwit", topCalc: "sum", headerSort: false},
-            {title: "Available", field: "available", formatter: "html", hozAlign: "center", headerSort: false}
-        ],
-    });
+  var calculateSumPerPage = function (values, data, calcParams) {
+    //values - array of column values
+    //data - all table data
+    //calcParams - params passed from the column definition object
 
-    let groupByCheckboxes = Array.from(document.getElementsByClassName("group-by"));
+    var calc = 0;
+    let dataOfThisPage = data.filter(e => e.current_page === "true");
 
-    for (let el of groupByCheckboxes) {
-        el.addEventListener("change", () => {
-            table.setGroupBy(groupByCheckboxes.filter(e => e.checked).map(e => e.value));
-        });
+    for (let i = 0; i < dataOfThisPage.length; i++) {
+      calc += dataOfThisPage[i].dwit;
     }
+
+    return calc;
+  }
+
+  function updateVisiblity() {
+    let intervalId = window.setTimeout(() => {
+      if (document.querySelector(".tabulator-table")) {
+        setValues();
+
+        for (let el of document.querySelectorAll(".tabulator-paginator")) {
+          el.addEventListener("click", () => setValues());
+        }
+
+        let pageSizeSelector = document.querySelector(".pagination-size");
+
+        pageSizeSelector.addEventListener("change", () => {
+          let pageSize = pageSizeSelector.selectedOptions[0].value;
+          localStorage.setItem("pageSize", pageSize);
+          table.setPageSize(pageSize);
+          setValues();
+        });
+
+        clearInterval(intervalId);
+      }
+    }, 100)
+  }
+
+  function setValues() {
+    localStorage.setItem("page", table.getPage());
+    let visibleElements = document.querySelector(".tabulator-table").childNodes;
+
+    for (let el of table.getRows()) {
+      el.update({"current_page": `${Array.from(visibleElements).includes(el.getElement())}`})
+    }
+
+    table.recalc();
+  }
+
+  function handleCheckBoxSelected() {
+    let checkedBoxes = groupByCheckboxes.filter(e => e.checked).map(e => e.value);
+
+    if (checkedBoxes.length === 0) {
+      location.reload();
+      return;
+    }
+
+    checkedBoxes.unshift("current_page");
+    table.setGroupValues([[true], false]);
+    table.setGroupBy(checkedBoxes);
+    table.setPageSize(true);
+  }
+
+  //define table
+  var table = new Tabulator("#example-table", {
+    height: "100%", // set height of table (in CSS or here), this enables the Virtual DOM and improves render speed dramatically (can be any valid css height value)
+    data: tabledata, //assign data to table
+    layout: "fitData", //fit columns to data (optional),
+    pagination: true, //enable pagination
+    paginationMode: "local", //enable local pagination
+    paginationSize: localStorage.getItem("pageSize"),
+    paginationInitialPage: localStorage.getItem("page"),
+    paginationCounter: "rows", //add pagination row counter
+    columns: [ //Define Table Columns
+      {title: "Name", field: "name", width: 150, headerSort: false},
+      {title: "Favourite Color", field: "col", headerSort: false},
+      {title: "Date Of Birth", field: "dob", headerSort: false},
+      {title: "Days worked in total", field: "dwit", topCalc: calculateSumPerPage, headerSort: false},
+      {title: "Available", field: "available", formatter: "html", hozAlign: "center", headerSort: false},
+      {title: "Current Page", field: "current_page", headerSort: false, visible: false}
+    ],
+  });
+
+  document.querySelector(".pagination-size").value = localStorage.getItem("pageSize");
+
+  let groupByCheckboxes = Array.from(document.getElementsByClassName("group-by"));
+
+  for (let el of groupByCheckboxes) {
+    el.addEventListener("change", () => handleCheckBoxSelected());
+  }
+
+  updateVisiblity();
 </script>
 </html>
