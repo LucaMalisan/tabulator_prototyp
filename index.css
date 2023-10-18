@@ -11,3 +11,7 @@
   justify-content: space-between;
   margin-bottom: 20px;
 }
+
+#download-table {
+  display: none;
+}

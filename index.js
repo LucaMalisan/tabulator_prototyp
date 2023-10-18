@@ -88,8 +88,7 @@ let langs = {
   }
 };
 
-//define data
-var tabledata = 0;
+let lang = localStorage.getItem("language");
 
 var calculateSumPerPage = function (values, data, calcParams) {
   //values - array of column values
@@ -105,6 +104,45 @@ var calculateSumPerPage = function (values, data, calcParams) {
 
   return calc;
 }
+
+let columns = [
+  {
+    title: langs[lang ? lang : "en"].columns.name,
+    field: "name",
+    headerSort: false
+  },
+  {
+    title: langs[lang ? lang : "en"].columns.col,
+    field: "col",
+    headerSort: false
+  },
+  {
+    title: langs[lang ? lang : "en"].columns.dob,
+    field: "dob",
+    headerSort: false
+  },
+  {
+    title: langs[lang ? lang : "en"].columns.dwit,
+    field: "dwit",
+    topCalc: calculateSumPerPage,
+    headerSort: false
+  },
+  {
+    title: langs[lang ? lang : "en"].columns.available,
+    field: "available",
+    formatter: "html",
+    hozAlign: "center",
+    headerSort: false
+  },
+  {
+    title: "Current Page",
+    field: "current_page",
+    headerSort: false,
+    visible: false,
+  }
+]
+
+//define data
 
 function updateVisiblity() {
   let intervalId = window.setTimeout(() => {
@@ -154,13 +192,15 @@ function handleCheckBoxSelected() {
     return;
   }
 
+  downloadTable.setGroupBy(checkedBoxes);
+  downloadTable.setPageSize(true);
+
   checkedBoxes.unshift("current_page");
+
   table.setGroupValues([[true], false]);
   table.setGroupBy(checkedBoxes);
   table.setPageSize(true);
 }
-
-let lang = localStorage.getItem("language");
 
 //define table
 var table = new Tabulator("#example-table", {
@@ -179,42 +219,20 @@ var table = new Tabulator("#example-table", {
   paginationSize: localStorage.getItem("pageSize"),
   paginationInitialPage: localStorage.getItem("page"),
   paginationCounter: "rows", //add pagination row counter
-  columns: [
-    {
-      title: langs[lang ? lang : "en"].columns.name,
-      field: "name",
-      headerSort: false
-    },
-    {
-      title: langs[lang ? lang : "en"].columns.col,
-      field: "col",
-      headerSort: false
-    },
-    {
-      title: langs[lang ? lang : "en"].columns.dob,
-      field: "dob",
-      headerSort: false
-    },
-    {
-      title: langs[lang ? lang : "en"].columns.dwit,
-      field: "dwit",
-      topCalc: calculateSumPerPage,
-      headerSort: false
-    },
-    {
-      title: langs[lang ? lang : "en"].columns.available,
-      field: "available",
-      formatter: "html",
-      hozAlign: "center",
-      headerSort: false
-    },
-    {
-      title: "Current Page",
-      field: "current_page",
-      headerSort: false,
-      visible: false
-    }
-  ],
+  columns: columns,
+  langs: langs
+});
+
+var downloadTable = new Tabulator("#download-table", {
+  height: "100%", // set height of table (in CSS or here), this enables the Virtual DOM and improves render speed dramatically (can be any valid css height value),
+  layout: "fitData", //fit columns to data (optional),
+  pagination: true, //enable pagination
+  reactiveData: true,
+  paginationMode: "local", //enable local pagination
+  paginationSize: localStorage.getItem("pageSize"),
+  paginationInitialPage: localStorage.getItem("page"),
+  paginationCounter: "rows", //add pagination row counter
+  columns: columns,
   langs: langs
 });
 
@@ -231,9 +249,13 @@ for (let el of groupByCheckboxes) {
 }
 
 document.getElementById("download-data").addEventListener("click", () => {
-  table.download("pdf", "data.pdf", {
+  debugger
+  let downloadData = table.getData().filter(e => e.current_page === "true")
+  downloadData.forEach(e => e.available = e.available.includes("done_outline"));
+  downloadTable.setData(downloadData);
+  downloadTable.download("pdf", "data.pdf", {
     autoTable: { //advanced table styling
-      headerStyles: {
+      headStyles: {
         fillColor: JSON.parse(document.querySelector(".select-color").value)
       },
       columnStyles: {
