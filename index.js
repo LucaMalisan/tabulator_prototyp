@@ -248,11 +248,14 @@ for (let el of groupByCheckboxes) {
   el.addEventListener("change", () => handleCheckBoxSelected());
 }
 
-document.getElementById("download-data").addEventListener("click", () => {
-  debugger
+function setDownloadTable() {
   let downloadData = table.getData().filter(e => e.current_page === "true")
   downloadData.forEach(e => e.available = e.available.includes("done_outline"));
   downloadTable.setData(downloadData);
+}
+
+document.getElementById("download-pdf").addEventListener("click", () => {
+  setDownloadTable();
   downloadTable.download("pdf", "data.pdf", {
     autoTable: { //advanced table styling
       headStyles: {
@@ -263,6 +266,16 @@ document.getElementById("download-data").addEventListener("click", () => {
       },
     },
   });
+});
+
+document.getElementById("download-xlxs").addEventListener("click", () => {
+  setDownloadTable();
+  downloadTable.download("xlsx", "data.xlsx", {sheetName: "MyData"}); //download a xlsx file that has a sheet name of "MyData"
+});
+
+document.getElementById("download-csv").addEventListener("click", () => {
+  setDownloadTable();
+  downloadTable.download("csv", "data.csv", {delimiter: ";", bom: true}); //download a CSV file that uses a fullstop (.) delimiter
 });
 
 updateVisiblity();
