@@ -107,6 +107,13 @@ var calculateSumPerPage = function (values, data, calcParams) {
 
 let columns = [
   {
+    formatter: "rowSelection",
+    titleFormatter: "rowSelection",
+    align: "center",
+    headerSort: false,
+    download: false
+  },
+  {
     title: langs[lang ? lang : "en"].columns.name,
     field: "name",
     headerSort: false
@@ -158,7 +165,7 @@ function updateVisiblity() {
       pageSizeSelector.addEventListener("change", () => {
         let pageSize = pageSizeSelector.selectedOptions[0].value;
         localStorage.setItem("pageSize", pageSize);
-        table.setPageSize(pageSize);
+        table.setPageSize(parsePaginationSize(pageSize))
         setValues();
       });
 
@@ -202,9 +209,9 @@ function handleCheckBoxSelected() {
   table.setPageSize(true);
 }
 
-//define table
-var table = new Tabulator("#example-table", {
+let config = {
   height: "100%", // set height of table (in CSS or here), this enables the Virtual DOM and improves render speed dramatically (can be any valid css height value),
+  selectable: true,
   ajaxURL: "data.json",
   ajaxResponse: function (url, params, response) {
     for (let el of response) {
@@ -216,25 +223,16 @@ var table = new Tabulator("#example-table", {
   pagination: true, //enable pagination
   reactiveData: true,
   paginationMode: "local", //enable local pagination
-  paginationSize: localStorage.getItem("pageSize"),
+  paginationSize: parsePaginationSize(localStorage.getItem("pageSize")),
   paginationInitialPage: localStorage.getItem("page"),
   paginationCounter: "rows", //add pagination row counter
   columns: columns,
   langs: langs
-});
+};
 
-var downloadTable = new Tabulator("#download-table", {
-  height: "100%", // set height of table (in CSS or here), this enables the Virtual DOM and improves render speed dramatically (can be any valid css height value),
-  layout: "fitData", //fit columns to data (optional),
-  pagination: true, //enable pagination
-  reactiveData: true,
-  paginationMode: "local", //enable local pagination
-  paginationSize: localStorage.getItem("pageSize"),
-  paginationInitialPage: localStorage.getItem("page"),
-  paginationCounter: "rows", //add pagination row counter
-  columns: columns,
-  langs: langs
-});
+//define table
+var table = new Tabulator("#example-table", config);
+var downloadTable = new Tabulator("#download-table", config);
 
 document.querySelector(".pagination-size").value = localStorage.getItem(
     "pageSize");
@@ -249,7 +247,16 @@ for (let el of groupByCheckboxes) {
 }
 
 function setDownloadTable() {
-  let downloadData = table.getData().filter(e => e.current_page === "true")
+  let downloadData;
+
+  if (table.getSelectedData().length > 0) {
+    //workaround because else, the data modification is visible in table
+    downloadTable.setData(table.getSelectedData());
+    downloadData = downloadTable.getData();
+  } else {
+    downloadData = table.getData().filter(e => e.current_page === "true")
+  }
+
   downloadData.forEach(e => e.available = e.available.includes("done_outline"));
   downloadTable.setData(downloadData);
 }
@@ -279,3 +286,10 @@ document.getElementById("download-csv").addEventListener("click", () => {
 });
 
 updateVisiblity();
+
+function parsePaginationSize(pageSize) {
+  if (pageSize === "true" || pageSize === "false") {
+    pageSize = pageSize === "true";
+  }
+  return pageSize;
+}
