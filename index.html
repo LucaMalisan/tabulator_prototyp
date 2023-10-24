@@ -1,6 +1,4 @@
 <!--
-TODO Responsiveness
-TODO Das Framework muss den DOM bei einer Seitengrössen von min. 100 Zeilen noch in unter 0.5 Sekunden generieren können.
 
 TODO (Test) Das Framework muss alle Funktionen, die mit Maus erledigt werden können, auch als Touch-Variante anbieten.
 TODO (Test) Es müssen min. folgende Webbrowser unterstützt werden: Google Chrome, Firefox, Safari, Edge
@@ -10,13 +8,22 @@ TODO (Test) Es müssen min. folgende Webbrowser unterstützt werden: Google Chro
 WON'T BE DONE
 - Skipping through pages while cells are grouped
 - effort for good code quality / safe or generic code ...
-- No external translation for control elements and table data, just control elements
+- No external translation for control elements and table data, just control elements.
+- No responsiveness of input fields
+- Only one responsive alternative for all screen widths < table width
+- Calculation, Grouping, Row Selection in mobile table
+-->
+
+<!--
+WILL BE DONE IF ENOUGH TIME
+- Translation of titles in mobile table
 -->
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
     <title>Title</title>
     <link rel="stylesheet"
           href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0"/>
@@ -88,6 +95,7 @@ WON'T BE DONE
 </div>
 
 <div id="example-table"></div>
+<div id="mobile-table"></div>
 <div id="download-table"></div>
 </body>
 <script src="index.js"></script>

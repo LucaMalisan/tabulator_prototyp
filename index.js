@@ -111,41 +111,48 @@ let columns = [
     titleFormatter: "rowSelection",
     align: "center",
     headerSort: false,
-    download: false
+    download: false,
+    width: 200
   },
   {
-    title: langs[lang ? lang : "en"].columns.name,
+    title: langs[lang ? lang : "en-gb"].columns.name,
     field: "name",
-    headerSort: false
+    headerSort: false,
+    width: 200
   },
   {
-    title: langs[lang ? lang : "en"].columns.col,
+    title: langs[lang ? lang : "en-gb"].columns.col,
     field: "col",
-    headerSort: false
+    headerSort: false,
+    width: 200
   },
   {
-    title: langs[lang ? lang : "en"].columns.dob,
+    title: langs[lang ? lang : "en-gb"].columns.dob,
     field: "dob",
-    headerSort: false
+    headerSort: false,
+    width: 200
   },
   {
-    title: langs[lang ? lang : "en"].columns.dwit,
+    title: langs[lang ? lang : "en-gb"].columns.dwit,
     field: "dwit",
     topCalc: calculateSumPerPage,
-    headerSort: false
+    headerSort: false,
+    width: 200
   },
   {
-    title: langs[lang ? lang : "en"].columns.available,
+    title: langs[lang ? lang : "en-gb"].columns.available,
     field: "available",
     formatter: "html",
     hozAlign: "center",
-    headerSort: false
+    headerSort: false,
+    width: 200
   },
   {
     title: "Current Page",
     field: "current_page",
     headerSort: false,
     visible: false,
+    width: 200
   }
 ]
 
@@ -166,12 +173,22 @@ function updateVisiblity() {
         let pageSize = pageSizeSelector.selectedOptions[0].value;
         localStorage.setItem("pageSize", pageSize);
         table.setPageSize(parsePaginationSize(pageSize))
+        mobileTable.setPageSize(parsePaginationSize(pageSize));
         setValues();
       });
 
       document.querySelector(".language").value = localStorage.getItem(
           "language");
       table.setLocale(localStorage.getItem("language"));
+      mobileTable.setLocale(localStorage.getItem("language"));
+
+      if (window.innerWidth < document.querySelector(
+          ".tabulator-table").clientWidth) {
+        document.getElementById("example-table").style.display = "none";
+        document.getElementById("mobile-table").style.display = "block";
+        document.getElementById(
+            "controls").firstElementChild.style.display = "none";
+      }
 
       clearInterval(intervalId);
     }
@@ -179,16 +196,29 @@ function updateVisiblity() {
 }
 
 function setValues() {
+  debugger
   localStorage.setItem("page", table.getPage());
-  let visibleElements = document.querySelector(".tabulator-table").childNodes;
 
-  for (let el of table.getRows()) {
-    el.update({
-      "current_page": `${Array.from(visibleElements).includes(el.getElement())}`
-    })
+  if (window.getComputedStyle(document.getElementById("mobile-table")).display
+      !== "none") {
+    table.setPageSize(mobileTable.getPageSize());
+    table.setPage(mobileTable.getPage());
+  } else {
+    let page = table.getPage();
+    mobileTable.setPageSize(table.getPageSize());
+    mobileTable.setPage(page);
+    table.setPage(page);
+    table.recalc();
   }
 
-  table.recalc();
+  let firstVisibleIndex = ((table.getPage() - 1) * table.getPageSize());
+  let lastVisibleIndex = ((table.getPage()) * table.getPageSize()) - 1;
+
+  for (let i = 0; i < table.getRows().length; i++) {
+    Array.from(table.getRows())[i].update({
+      "current_page": i >= firstVisibleIndex && i <= lastVisibleIndex
+    })
+  }
 }
 
 function handleCheckBoxSelected() {
@@ -219,13 +249,12 @@ let config = {
     }
     return response;
   },
-  layout: "fitData", //fit columns to data (optional),
+  layout: "fitColumns", //fit columns to data (optional),
   pagination: true, //enable pagination
-  reactiveData: true,
   paginationMode: "local", //enable local pagination
   paginationSize: parsePaginationSize(localStorage.getItem("pageSize")),
   paginationInitialPage: localStorage.getItem("page"),
-  paginationCounter: "rows", //add pagination row counter
+  paginationCounter: "rows", //add pagination row counter,
   columns: columns,
   langs: langs
 };
@@ -233,6 +262,27 @@ let config = {
 //define table
 var table = new Tabulator("#example-table", config);
 var downloadTable = new Tabulator("#download-table", config);
+var mobileTable = new Tabulator("#mobile-table", {
+  ajaxURL: "data.json",
+  ajaxResponse: function (url, params, response) {
+    return convertJsonToHtml(response);
+  },
+  columns: [
+    {formatter: "html", field: "data-table"}
+  ],
+  layout: "fitDataStretch",
+  pagination: true, //enable pagination
+  paginationMode: "local", //enable local pagination
+  paginationSize: parsePaginationSize(localStorage.getItem("pageSize")),
+  paginationInitialPage: localStorage.getItem("page"),
+  paginationCounter: "rows", //add pagination row counter,
+  langs: langs
+});
+
+mobileTable.on("pageSizeChanged", function (pagesize) {
+  table.setPageSize(pagesize);
+  downloadTable.setPageSize(pagesize);
+});
 
 document.querySelector(".pagination-size").value = localStorage.getItem(
     "pageSize");
@@ -248,13 +298,14 @@ for (let el of groupByCheckboxes) {
 
 function setDownloadTable() {
   let downloadData;
+  debugger
 
   if (table.getSelectedData().length > 0) {
     //workaround because else, the data modification is visible in table
     downloadTable.setData(table.getSelectedData());
     downloadData = downloadTable.getData();
   } else {
-    downloadData = table.getData().filter(e => e.current_page === "true")
+    downloadData = table.getData().filter(e => e.current_page === true)
   }
 
   downloadData.forEach(e => e.available = e.available.includes("done_outline"));
@@ -292,4 +343,20 @@ function parsePaginationSize(pageSize) {
     pageSize = pageSize === "true";
   }
   return pageSize;
+}
+
+function convertJsonToHtml(json) {
+  let htmlElements = [];
+
+  for (let el of json) {
+    let htmlStr = "<table>"
+    for (let attr in el) {
+      if (attr !== "id") {
+        htmlStr += `<tr> <th> ${attr} </th> <td> ${el[attr]} </td> </tr>`
+      }
+    }
+    htmlStr += "</table>"
+    htmlElements.push({"data-table": htmlStr});
+  }
+  return htmlElements;
 }
