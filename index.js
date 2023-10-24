@@ -96,7 +96,7 @@ var calculateSumPerPage = function (values, data, calcParams) {
   //calcParams - params passed from the column definition object
 
   var calc = 0;
-  let dataOfThisPage = data.filter(e => e.current_page === "true");
+  let dataOfThisPage = data.filter(e => e.current_page === true);
 
   for (let i = 0; i < dataOfThisPage.length; i++) {
     calc += dataOfThisPage[i].dwit;
@@ -196,7 +196,6 @@ function updateVisiblity() {
 }
 
 function setValues() {
-  debugger
   localStorage.setItem("page", table.getPage());
 
   if (window.getComputedStyle(document.getElementById("mobile-table")).display
@@ -298,7 +297,6 @@ for (let el of groupByCheckboxes) {
 
 function setDownloadTable() {
   let downloadData;
-  debugger
 
   if (table.getSelectedData().length > 0) {
     //workaround because else, the data modification is visible in table
