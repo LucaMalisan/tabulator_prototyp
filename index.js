@@ -218,6 +218,8 @@ function setValues() {
       "current_page": i >= firstVisibleIndex && i <= lastVisibleIndex
     })
   }
+
+  table.recalc();
 }
 
 function handleCheckBoxSelected() {
