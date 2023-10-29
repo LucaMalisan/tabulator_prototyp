@@ -112,32 +112,27 @@ let columns = [
     align: "center",
     headerSort: false,
     download: false,
-    width: 200
   },
   {
     title: langs[lang ? lang : "en-gb"].columns.name,
     field: "name",
     headerSort: false,
-    width: 200
   },
   {
     title: langs[lang ? lang : "en-gb"].columns.col,
     field: "col",
     headerSort: false,
-    width: 200
   },
   {
     title: langs[lang ? lang : "en-gb"].columns.dob,
     field: "dob",
     headerSort: false,
-    width: 200
   },
   {
     title: langs[lang ? lang : "en-gb"].columns.dwit,
     field: "dwit",
     topCalc: calculateSumPerPage,
     headerSort: false,
-    width: 200
   },
   {
     title: langs[lang ? lang : "en-gb"].columns.available,
@@ -145,14 +140,12 @@ let columns = [
     formatter: "html",
     hozAlign: "center",
     headerSort: false,
-    width: 200
   },
   {
     title: "Current Page",
     field: "current_page",
     headerSort: false,
     visible: false,
-    width: 200
   }
 ]
 
@@ -250,7 +243,7 @@ let config = {
     }
     return response;
   },
-  layout: "fitColumns", //fit columns to data (optional),
+  layout: "fitData", //fit columns to data (optional),
   pagination: true, //enable pagination
   paginationMode: "local", //enable local pagination
   paginationSize: parsePaginationSize(localStorage.getItem("pageSize")),
